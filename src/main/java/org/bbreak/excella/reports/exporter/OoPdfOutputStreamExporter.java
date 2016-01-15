@@ -37,6 +37,7 @@ import java.io.OutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.artofsolving.jodconverter.office.OfficeManager;
 import org.bbreak.excella.core.BookData;
 import org.bbreak.excella.core.exception.ExportException;
 import org.bbreak.excella.reports.model.ConvertConfiguration;
@@ -79,6 +80,11 @@ public class OoPdfOutputStreamExporter extends OoPdfExporter {
      * @param outputStream 出力ストリーム
      */
     public OoPdfOutputStreamExporter( OutputStream outputStream) {
+        this.outputStream = outputStream;
+    }
+
+    public OoPdfOutputStreamExporter( OfficeManager officeManager, OutputStream outputStream) {
+        super( officeManager);
         this.outputStream = outputStream;
     }
 
