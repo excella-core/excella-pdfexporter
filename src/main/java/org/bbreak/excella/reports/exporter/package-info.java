@@ -26,8 +26,7 @@
  *
  ************************************************************************/
 /**
- * TODO: クラスの説明
- *
- * @since TODO: 対応バージョン
+ * Excella ReportsのPDF出力用クラス
+ * 
  */
 package org.bbreak.excella.reports.exporter;
