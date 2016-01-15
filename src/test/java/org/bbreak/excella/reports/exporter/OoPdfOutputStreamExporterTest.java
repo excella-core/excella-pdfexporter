@@ -33,11 +33,12 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Date;
 
+import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
+import org.artofsolving.jodconverter.office.OfficeManager;
 import org.bbreak.excella.reports.ReportsTestUtil;
 import org.bbreak.excella.reports.model.ConvertConfiguration;
 import org.bbreak.excella.reports.model.ReportBook;
@@ -56,7 +57,7 @@ public class OoPdfOutputStreamExporterTest {
 
     ConvertConfiguration configuration = null;
 
-    private OutputStream outputStream;
+    private OfficeManager officeManager = new ExternalOfficeManagerConfiguration().setPortNumber( 8100).buildOfficeManager();
 
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfOutputStreamExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}
@@ -84,7 +85,8 @@ public class OoPdfOutputStreamExporterTest {
             File xlsStreamFile = new File( filePath + "_stream.pdf");
             xlsFileOutputStream = new FileOutputStream( xlsStreamFile);
 
-            xlsReportProcessor.addReportBookExporter( new OoPdfOutputStreamExporter( xlsFileOutputStream));
+            xlsReportProcessor.addReportBookExporter( new OoPdfExporter( officeManager));
+            xlsReportProcessor.addReportBookExporter( new OoPdfOutputStreamExporter( officeManager, xlsFileOutputStream));
             xlsReportProcessor.process( xlsOutputBook);
 
             File xlsExcelFile = new File( filePath + ".pdf");
@@ -121,7 +123,7 @@ public class OoPdfOutputStreamExporterTest {
             File xlsStreamFile = new File( filePath + "_existStream.pdf");
             xlsFileOutputStream = new FileOutputStream( xlsStreamFile);
 
-            xlsReportProcessor.addReportBookExporter( new OoPdfOutputStreamExporter( xlsFileOutputStream));
+            xlsReportProcessor.addReportBookExporter( new OoPdfOutputStreamExporter( officeManager, xlsFileOutputStream));
             xlsReportProcessor.process( xlsOutputBook);
 
             File xlsExcelFile = new File( filePath + "_exist.pdf");
@@ -161,7 +163,7 @@ public class OoPdfOutputStreamExporterTest {
             xlsxFileOutputStream = new FileOutputStream( xlsxStreamFile);
 
             ReportProcessor xlsxReportProcessor = new ReportProcessor();
-            xlsxReportProcessor.addReportBookExporter( new OoPdfOutputStreamExporter( xlsxFileOutputStream));
+            xlsxReportProcessor.addReportBookExporter( new OoPdfOutputStreamExporter( officeManager, xlsxFileOutputStream));
             xlsxReportProcessor.process( xlsOutputBook);
 
 //            fail( "XLSXは変換不可");

@@ -34,8 +34,9 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.Date;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
+import org.artofsolving.jodconverter.office.OfficeManager;
 import org.bbreak.excella.core.BookData;
 import org.bbreak.excella.core.exception.ExportException;
 import org.bbreak.excella.reports.ReportsTestUtil;
@@ -57,6 +58,8 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
     private String tmpDirPath = ReportsTestUtil.getTestOutputDir();
 
     ConvertConfiguration configuration = null;
+    
+    private OfficeManager officeManager = new ExternalOfficeManagerConfiguration().setPortNumber( 8100).buildOfficeManager();
 
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}
@@ -65,7 +68,7 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
     @Test
     public void testOutput() {
 
-        OoPdfExporter exporter = new OoPdfExporter();
+        OoPdfExporter exporter = new OoPdfExporter( officeManager);
         String filePath = null;
 
         Workbook wb = getWorkbook();
@@ -130,7 +133,7 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
      */
     @Test
     public void testGetFormatType() {
-        OoPdfExporter exporter = new OoPdfExporter();
+        OoPdfExporter exporter = new OoPdfExporter( officeManager);
         assertEquals( "PDF", exporter.getFormatType());
     }
 
@@ -139,7 +142,7 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
      */
     @Test
     public void testGetExtention() {
-        OoPdfExporter exporter = new OoPdfExporter();
+        OoPdfExporter exporter = new OoPdfExporter( officeManager);
         assertEquals( ".pdf", exporter.getExtention());
     }
 
