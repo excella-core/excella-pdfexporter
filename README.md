@@ -61,5 +61,9 @@ ${LIBREOFFICE_HOME}/program/soffice -headless -accept=socket,port=8100;urp;
   reportProcessor.process( outputBook);
 ```
 
+6. 更新履歴  
+-------------
+* 2016/01/17 Version 1.0 リリース
+
 
 Copyright 2015 by bBreak Systems.
