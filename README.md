@@ -63,7 +63,7 @@ ${LIBREOFFICE_HOME}/program/soffice -headless -accept=socket,port=8100;urp;
 
 6. 更新履歴  
 -------------
-* 2016/04/04 Version 1.1 リリース
+* 2016/04/05 Version 1.1 リリース
 * 2016/01/17 Version 1.0 リリース
 
 
