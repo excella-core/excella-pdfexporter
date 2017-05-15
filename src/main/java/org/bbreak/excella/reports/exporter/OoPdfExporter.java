@@ -151,7 +151,8 @@ public class OoPdfExporter extends ReportBookExporter {
 
             // 一時フォルダに吐き出し
             ExcelExporter excelExporter = new ExcelExporter();
-            String tmpFileName = System.getProperty( "java.io.tmpdir") + System.currentTimeMillis();
+            tmpFile = File.createTempFile( getClass().getSimpleName(), null);
+            String tmpFileName = tmpFile.getCanonicalPath();
             excelExporter.setFilePath( tmpFileName);
             excelExporter.output( book, bookdata, null);
 
