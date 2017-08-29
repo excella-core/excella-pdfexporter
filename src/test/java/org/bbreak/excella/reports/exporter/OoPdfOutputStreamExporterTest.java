@@ -37,8 +37,8 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Date;
 
-import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
-import org.artofsolving.jodconverter.office.OfficeManager;
+import org.jodconverter.office.ExternalOfficeManagerBuilder;
+import org.jodconverter.office.OfficeManager;
 import org.bbreak.excella.reports.ReportsTestUtil;
 import org.bbreak.excella.reports.model.ConvertConfiguration;
 import org.bbreak.excella.reports.model.ReportBook;
@@ -57,7 +57,7 @@ public class OoPdfOutputStreamExporterTest {
 
     ConvertConfiguration configuration = null;
 
-    private OfficeManager officeManager = new ExternalOfficeManagerConfiguration().setPortNumber( 8100).buildOfficeManager();
+    private OfficeManager officeManager = new ExternalOfficeManagerBuilder().setPortNumber( 8100).build();
 
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfOutputStreamExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}

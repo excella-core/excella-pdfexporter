@@ -35,8 +35,8 @@ import java.io.File;
 import java.util.Date;
 
 import org.apache.poi.ss.usermodel.Workbook;
-import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
-import org.artofsolving.jodconverter.office.OfficeManager;
+import org.jodconverter.office.ExternalOfficeManagerBuilder;
+import org.jodconverter.office.OfficeManager;
 import org.bbreak.excella.core.BookData;
 import org.bbreak.excella.core.exception.ExportException;
 import org.bbreak.excella.reports.ReportsTestUtil;
@@ -59,7 +59,7 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
 
     ConvertConfiguration configuration = null;
     
-    private OfficeManager officeManager = new ExternalOfficeManagerConfiguration().setPortNumber( 8100).buildOfficeManager();
+    private OfficeManager officeManager = new ExternalOfficeManagerBuilder().setPortNumber( 8100).build();
 
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}

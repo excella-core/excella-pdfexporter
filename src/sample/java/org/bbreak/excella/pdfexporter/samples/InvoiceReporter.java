@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.artofsolving.jodconverter.office.ExternalOfficeManagerConfiguration;
-import org.artofsolving.jodconverter.office.OfficeManager;
+import org.jodconverter.office.ExternalOfficeManagerBuilder;
+import org.jodconverter.office.OfficeManager;
 import org.bbreak.excella.reports.exporter.OoPdfExporter;
 import org.bbreak.excella.reports.model.ReportBook;
 import org.bbreak.excella.reports.model.ReportSheet;
@@ -117,7 +117,7 @@ public class InvoiceReporter {
         // ReportBookを元にレポート処理を実行します。
         // 
         ReportProcessor reportProcessor = new ReportProcessor();
-        OfficeManager officeManager = new ExternalOfficeManagerConfiguration().setPortNumber( 8100).buildOfficeManager();
+        OfficeManager officeManager = new ExternalOfficeManagerBuilder().setPortNumber( 8100).build();
         reportProcessor.addReportBookExporter( new OoPdfExporter(officeManager));
         reportProcessor.process( outputBook);
         

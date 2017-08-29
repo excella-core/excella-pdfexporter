@@ -56,7 +56,7 @@ ${LIBREOFFICE_HOME}/program/soffice -headless -accept=socket,port=8100;urp;
 ```
   ReportProcessor reportProcessor = new ReportProcessor();
   OfficeManager officeManager =
-    new ExternalOfficeManagerConfiguration().setPortNumber( 8100).buildOfficeManager();
+    new ExternalOfficeManagerBuilder().setPortNumber( 8100).build();
   reportProcessor.addReportBookExporter( new OoPdfExporter(officeManager));
   reportProcessor.process( outputBook);
 ```
