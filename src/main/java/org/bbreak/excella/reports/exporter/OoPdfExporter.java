@@ -34,14 +34,15 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.artofsolving.jodconverter.OfficeDocumentConverter;
-import org.artofsolving.jodconverter.document.DefaultDocumentFormatRegistry;
-import org.artofsolving.jodconverter.document.DocumentFamily;
-import org.artofsolving.jodconverter.document.DocumentFormat;
-import org.artofsolving.jodconverter.document.DocumentFormatRegistry;
-import org.artofsolving.jodconverter.document.SimpleDocumentFormatRegistry;
-import org.artofsolving.jodconverter.office.DefaultOfficeManagerConfiguration;
-import org.artofsolving.jodconverter.office.OfficeManager;
+import org.jodconverter.OfficeDocumentConverter;
+import org.jodconverter.document.DefaultDocumentFormatRegistry;
+import org.jodconverter.document.DocumentFamily;
+import org.jodconverter.document.DocumentFormat;
+import org.jodconverter.document.DocumentFormatRegistry;
+import org.jodconverter.document.SimpleDocumentFormatRegistry;
+import org.jodconverter.office.DefaultOfficeManagerBuilder;
+import org.jodconverter.office.OfficeException;
+import org.jodconverter.office.OfficeManager;
 import org.bbreak.excella.core.BookData;
 import org.bbreak.excella.core.exception.ExportException;
 import org.bbreak.excella.reports.model.ConvertConfiguration;
@@ -134,8 +135,12 @@ public class OoPdfExporter extends ReportBookExporter {
         }
 
         if ( !controlOfficeManager) {
-            officeManager = new DefaultOfficeManagerConfiguration().setPortNumber( port).buildOfficeManager();
-            officeManager.start();
+            officeManager = new DefaultOfficeManagerBuilder().setPortNumber( port).build();
+            try {
+                officeManager.start();
+            } catch ( OfficeException e) {
+                throw new ExportException( e);
+           }
         }
 
         File tmpFile = null;
@@ -164,12 +169,16 @@ public class OoPdfExporter extends ReportBookExporter {
             throw new ExportException( e);
         } finally {
 
-            if ( !controlOfficeManager) {
-                officeManager.stop();
-            }
             if ( tmpFile != null) {
                 // EXCEL削除
                 tmpFile.delete();
+            }
+            if ( !controlOfficeManager) {
+                try {
+                    officeManager.stop();
+                } catch ( OfficeException e) {
+                    throw new ExportException( e);
+                }
             }
         }
     }
@@ -182,7 +191,7 @@ public class OoPdfExporter extends ReportBookExporter {
      */
     private DocumentFormatRegistry createDocumentFormatRegistry( ConvertConfiguration configuration) {
 
-        SimpleDocumentFormatRegistry registry = new DefaultDocumentFormatRegistry();
+        SimpleDocumentFormatRegistry registry = DefaultDocumentFormatRegistry.getInstance();
 
         if ( configuration == null || configuration.getOptionsProperties().isEmpty()) {
             return registry;

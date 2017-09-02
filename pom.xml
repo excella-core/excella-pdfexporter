@@ -99,31 +99,9 @@
   		<scope>test</scope>
   	</dependency>
   	<dependency>
-  		<groupId>com.artofsolving</groupId>
+  		<groupId>org.jodconverter</groupId>
   		<artifactId>jodconverter-core</artifactId>
-  		<version>3.0-beta-4</version>
-  		<scope>system</scope>
-  		<systemPath>${basedir}/lib/jodconverter-core-3.0-beta-4.jar</systemPath>
+  		<version>4.0.0-RELEASE</version>
   	</dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>1.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openoffice</groupId>
-      <artifactId>juh</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openoffice</groupId>
-      <artifactId>ridl</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openoffice</groupId>
-      <artifactId>unoil</artifactId>
-      <version>3.2.1</version>
-    </dependency>
   </dependencies>
 </project>
