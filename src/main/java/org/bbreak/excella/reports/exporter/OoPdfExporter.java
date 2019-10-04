@@ -28,9 +28,6 @@
 package org.bbreak.excella.reports.exporter;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -135,7 +132,7 @@ public class OoPdfExporter extends ReportBookExporter {
         }
 
         if ( !controlOfficeManager) {
-            officeManager = new DefaultOfficeManagerBuilder().setPortNumber( port).build();
+            officeManager = new DefaultOfficeManagerBuilder().setPortNumbers( port).build();
             try {
                 officeManager.start();
             } catch ( OfficeException e) {
@@ -191,17 +188,19 @@ public class OoPdfExporter extends ReportBookExporter {
      */
     private DocumentFormatRegistry createDocumentFormatRegistry( ConvertConfiguration configuration) {
 
-        SimpleDocumentFormatRegistry registry = DefaultDocumentFormatRegistry.getInstance();
+        SimpleDocumentFormatRegistry registry = ( SimpleDocumentFormatRegistry) DefaultDocumentFormatRegistry.getInstance();
 
         if ( configuration == null || configuration.getOptionsProperties().isEmpty()) {
             return registry;
         }
 
-        DocumentFormat documentFormat = registry.getFormatByExtension( "pdf");
-        Map<String, Object> optionMap = new HashMap<String, Object>( documentFormat.getStoreProperties( DocumentFamily.SPREADSHEET));
+        DocumentFormat sourceFormat = registry.getFormatByExtension( "pdf");
+        DocumentFormat modifiedFormat = DocumentFormat.builder() //
+            .from( sourceFormat) //
+            .storeProperty( DocumentFamily.SPREADSHEET, "FilterData", configuration.getOptions()) //
+            .build();
 
-        optionMap.put( "FilterData", configuration.getOptions());
-        documentFormat.setStoreProperties( DocumentFamily.SPREADSHEET, optionMap);
+        registry.addFormat( modifiedFormat);
 
         return registry;
     }
