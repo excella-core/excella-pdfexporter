@@ -31,7 +31,10 @@ import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.jodconverter.OfficeDocumentConverter;
+import org.bbreak.excella.core.BookData;
+import org.bbreak.excella.core.exception.ExportException;
+import org.bbreak.excella.reports.model.ConvertConfiguration;
+import org.jodconverter.LocalConverter;
 import org.jodconverter.document.DefaultDocumentFormatRegistry;
 import org.jodconverter.document.DocumentFamily;
 import org.jodconverter.document.DocumentFormat;
@@ -40,9 +43,6 @@ import org.jodconverter.document.SimpleDocumentFormatRegistry;
 import org.jodconverter.office.DefaultOfficeManagerBuilder;
 import org.jodconverter.office.OfficeException;
 import org.jodconverter.office.OfficeManager;
-import org.bbreak.excella.core.BookData;
-import org.bbreak.excella.core.exception.ExportException;
-import org.bbreak.excella.reports.model.ConvertConfiguration;
 
 /**
  * OpenOfficePDF出力エクスポーター
@@ -126,7 +126,6 @@ public class OoPdfExporter extends ReportBookExporter {
 //        if ( book instanceof XSSFWorkbook) {
 //            throw new IllegalArgumentException( "XSSFFile not supported.");
 //        }
-
         if ( log.isInfoEnabled()) {
             log.info( "処理結果を" + getFilePath() + "に出力します");
         }
@@ -143,13 +142,12 @@ public class OoPdfExporter extends ReportBookExporter {
         File tmpFile = null;
         try {
 
-            OfficeDocumentConverter converter = null;
-            if ( configuration.getOptionsProperties().isEmpty()) {
-                converter = new OfficeDocumentConverter( officeManager);
-            } else {
+            LocalConverter.Builder converterBuilder = LocalConverter.builder();
+            if ( !configuration.getOptionsProperties().isEmpty()) {
                 DocumentFormatRegistry registry = createDocumentFormatRegistry( configuration);
-                converter = new OfficeDocumentConverter( officeManager, registry);
+                converterBuilder.formatRegistry( registry);
             }
+            LocalConverter converter = converterBuilder.officeManager( officeManager).build();
 
             // 一時フォルダに吐き出し
             ExcelExporter excelExporter = new ExcelExporter();
@@ -160,7 +158,8 @@ public class OoPdfExporter extends ReportBookExporter {
 
             tmpFileName = excelExporter.getFilePath();
             tmpFile = new File( tmpFileName);
-            converter.convert( tmpFile, new File( getFilePath()));
+
+            converter.convert( tmpFile).to( new File( getFilePath())).execute();
 
         } catch ( Exception e) {
             throw new ExportException( e);
