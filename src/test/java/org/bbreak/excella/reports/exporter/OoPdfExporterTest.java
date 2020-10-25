@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -44,22 +45,25 @@ import org.junit.Test;
  */
 public class OoPdfExporterTest extends ReportsWorkbookTest {
 
-    public OoPdfExporterTest( String version) {
-        super( version);
+    public OoPdfExporterTest(String version) {
+        super(version);
     }
 
     private String tmpDirPath = ReportsTestUtil.getTestOutputDir();
 
     ConvertConfiguration configuration = null;
-    
-    private OfficeManager officeManager = new ExternalOfficeManagerBuilder().setPortNumber( 8100).build();
+
+    private OfficeManager officeManager = new ExternalOfficeManagerBuilder().setPortNumber(8100).build();
 
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}
      * のためのテスト・メソッド。
+     * 
+     * @throws IOException
+     * @throws ExportException
      */
     @Test
-    public void testOutput() {
+    public void testOutput() throws IOException, ExportException {
 
         OoPdfExporter exporter = new OoPdfExporter( officeManager);
         String filePath = null;
@@ -70,14 +74,10 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
             configuration = new ConvertConfiguration( OoPdfExporter.EXTENTION);
             filePath = tmpDirPath + System.currentTimeMillis() + exporter.getExtention();
             exporter.setFilePath( filePath);
-            try {
-                exporter.output( wb, new BookData(), configuration);
-                File file = new File( exporter.getFilePath());
-                assertTrue( file.exists());
-            } catch ( ExportException e) {
-                e.printStackTrace();
-                fail( e.toString());
-            }
+
+            exporter.output( wb, new BookData(), configuration);
+            File file = new File( exporter.getFilePath());
+            assertTrue( file.exists());
 
             // オプション指定
             wb = getWorkbook();
@@ -87,36 +87,26 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
             configuration.addOption( "Changes", 4);
             filePath = tmpDirPath + System.currentTimeMillis() + exporter.getExtention();
             exporter.setFilePath( filePath);
-            try {
-                exporter.output( wb, new BookData(), configuration);
-                File file = new File( exporter.getFilePath());
-                assertTrue( file.exists());
-            } catch ( ExportException e) {
-                e.printStackTrace();
-                fail( e.toString());
-            }
+
+            exporter.output( wb, new BookData(), configuration);
+            file = new File( exporter.getFilePath());
+            assertTrue( file.exists());
 
             // 例外発生
             wb = getWorkbook();
             configuration = new ConvertConfiguration( OoPdfExporter.EXTENTION);
             filePath = tmpDirPath + (new Date()).getTime() + exporter.getExtention();
             exporter.setFilePath( filePath);
-            try {
-                exporter.output( wb, new BookData(), configuration);
-            } catch ( ExportException e) {
-                fail( e.toString());
-            }
-            File file = new File( exporter.getFilePath());
+
+            exporter.output( wb, new BookData(), configuration);
+
+            file = new File( exporter.getFilePath());
             file.setReadOnly();
             try {
                 exporter.output( wb, new BookData(), configuration);
                 fail( "例外未発生");
-            } catch ( Exception e) {
-                if ( e instanceof ExportException) {
-                    // OK
-                } else {
-                    fail( e.toString());
-                }
+            } catch ( ExportException expected) {
+                // ok
             }
 
     }
