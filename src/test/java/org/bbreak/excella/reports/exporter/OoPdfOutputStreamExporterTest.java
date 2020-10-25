@@ -20,24 +20,23 @@
 
 package org.bbreak.excella.reports.exporter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Date;
 
 import org.jodconverter.office.ExternalOfficeManagerBuilder;
 import org.jodconverter.office.OfficeManager;
+import org.junit.jupiter.api.Test;
 import org.bbreak.excella.reports.ReportsTestUtil;
 import org.bbreak.excella.reports.model.ConvertConfiguration;
 import org.bbreak.excella.reports.model.ReportBook;
 import org.bbreak.excella.reports.model.ReportSheet;
 import org.bbreak.excella.reports.processor.ReportProcessor;
-import org.junit.Test;
 
 /**
  * {@link org.bbreak.excella.reports.exporter.OoPdfOutputStreamExporter} のためのテスト・クラス。
@@ -55,9 +54,11 @@ public class OoPdfOutputStreamExporterTest {
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfOutputStreamExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}
      * のためのテスト・メソッド。
+     * 
+     * @throws Exception
      */
     @Test
-    public void testOutput() {
+    public void testOutput() throws Exception {
 
         // XLSテスト� - フォーマット複数指定・サイズ比較テスト
         FileOutputStream xlsFileOutputStream = null;
@@ -89,16 +90,8 @@ public class OoPdfOutputStreamExporterTest {
             long xlsStreamFileSize = xlsStreamFile.length();
             assertEquals( xlsFileByteLength, xlsStreamFileSize);
 
-        } catch ( Exception e) {
-            e.getStackTrace();
-            fail( e.toString());
         } finally {
-            try {
-                xlsFileOutputStream.close();
-            } catch ( IOException e) {
-                e.printStackTrace();
-                fail( e.toString());
-            }
+            xlsFileOutputStream.close();
         }
 
         // XLSテスト� - フォーマット単数指定・ストリーム出力によるファイル以外が削除されていることを確認
@@ -130,16 +123,8 @@ public class OoPdfOutputStreamExporterTest {
             if ( xlsExcelFile.exists()) {
                 fail( "PDFfile exists.");
             }
-        } catch ( Exception e) {
-            e.getStackTrace();
-            fail( e.toString());
         } finally {
-            try {
-                xlsFileOutputStream.close();
-            } catch ( IOException e) {
-                e.printStackTrace();
-                fail( e.toString());
-            }
+            xlsFileOutputStream.close();
         }
 
         // XLSX
@@ -160,20 +145,13 @@ public class OoPdfOutputStreamExporterTest {
             xlsxReportProcessor.process( xlsOutputBook);
 
 //            fail( "XLSXは変換不可");
-        } catch ( IllegalArgumentException e) {
-            fail( e.toString());
         } catch ( Exception e) {
             e.printStackTrace();
 //            fail( e.toString());
             // TODO org.artofsolving.jodconverter.office.OfficeException: could not store document
             // が発生する
         } finally {
-            try {
-                xlsxFileOutputStream.close();
-            } catch ( IOException e) {
-                e.printStackTrace();
-                fail( e.toString());
-            }
+            xlsxFileOutputStream.close();
         }
     }
 }
