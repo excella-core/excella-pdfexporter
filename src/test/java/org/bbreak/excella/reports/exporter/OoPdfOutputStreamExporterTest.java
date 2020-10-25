@@ -20,8 +20,8 @@
 
 package org.bbreak.excella.reports.exporter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,12 +31,12 @@ import java.util.Date;
 
 import org.jodconverter.office.ExternalOfficeManagerBuilder;
 import org.jodconverter.office.OfficeManager;
+import org.junit.jupiter.api.Test;
 import org.bbreak.excella.reports.ReportsTestUtil;
 import org.bbreak.excella.reports.model.ConvertConfiguration;
 import org.bbreak.excella.reports.model.ReportBook;
 import org.bbreak.excella.reports.model.ReportSheet;
 import org.bbreak.excella.reports.processor.ReportProcessor;
-import org.junit.Test;
 
 /**
  * {@link org.bbreak.excella.reports.exporter.OoPdfOutputStreamExporter} のためのテスト・クラス。

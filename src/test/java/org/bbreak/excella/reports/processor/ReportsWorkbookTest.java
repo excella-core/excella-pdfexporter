@@ -41,15 +41,7 @@ import org.bbreak.excella.reports.tag.ReportsTagParser;
 
 public abstract class ReportsWorkbookTest extends WorkbookTest {
 
-    /** Excelファイルのバージョン */
-    protected String version = null;
-
-    public ReportsWorkbookTest( String version) {
-        super( version);
-        this.version = version;
-    }
-
-    protected Workbook getExpectedWorkbook() throws IOException {
+    protected Workbook getExpectedWorkbook( String version) throws IOException {
 
         Workbook workbook = null;
 
