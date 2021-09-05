@@ -30,10 +30,10 @@ import java.io.OutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.jodconverter.office.OfficeManager;
 import org.bbreak.excella.core.BookData;
 import org.bbreak.excella.core.exception.ExportException;
 import org.bbreak.excella.reports.model.ConvertConfiguration;
+import org.jodconverter.core.office.OfficeManager;
 
 /**
  * PDFをStreamに書き出すExporter

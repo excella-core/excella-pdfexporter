@@ -28,13 +28,14 @@ import java.io.File;
 import java.util.Date;
 
 import org.apache.poi.ss.usermodel.Workbook;
-import org.jodconverter.office.ExternalOfficeManagerBuilder;
-import org.jodconverter.office.OfficeManager;
 import org.bbreak.excella.core.BookData;
 import org.bbreak.excella.core.exception.ExportException;
 import org.bbreak.excella.reports.ReportsTestUtil;
 import org.bbreak.excella.reports.model.ConvertConfiguration;
 import org.bbreak.excella.reports.processor.ReportsWorkbookTest;
+import org.jodconverter.core.office.OfficeException;
+import org.jodconverter.core.office.OfficeManager;
+import org.jodconverter.local.office.ExternalOfficeManager;
 import org.junit.Test;
 
 /**
@@ -52,14 +53,16 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
 
     ConvertConfiguration configuration = null;
     
-    private OfficeManager officeManager = new ExternalOfficeManagerBuilder().setPortNumber( 8100).build();
+    private OfficeManager officeManager = ExternalOfficeManager.builder().portNumbers( 8100).build();
 
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}
      * のためのテスト・メソッド。
+     * @throws OfficeException 
      */
     @Test
-    public void testOutput() {
+    public void testOutput() throws OfficeException {
+    	officeManager.start();
 
         OoPdfExporter exporter = new OoPdfExporter( officeManager);
         String filePath = null;
