@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.jodconverter.office.ExternalOfficeManagerBuilder;
-import org.jodconverter.office.OfficeManager;
 import org.bbreak.excella.reports.exporter.OoPdfExporter;
 import org.bbreak.excella.reports.model.ReportBook;
 import org.bbreak.excella.reports.model.ReportSheet;
@@ -37,6 +35,8 @@ import org.bbreak.excella.reports.processor.ReportProcessor;
 import org.bbreak.excella.reports.tag.ImageParamParser;
 import org.bbreak.excella.reports.tag.RowRepeatParamParser;
 import org.bbreak.excella.reports.tag.SingleParamParser;
+import org.jodconverter.core.office.OfficeManager;
+import org.jodconverter.local.office.ExternalOfficeManager;
 
 /**
  * 請求書サンプル出力クラス
@@ -137,9 +137,14 @@ public class InvoiceReporter {
         // ReportBookを元にレポート処理を実行します。
         // 
         ReportProcessor reportProcessor = new ReportProcessor();
-        OfficeManager officeManager = new ExternalOfficeManagerBuilder().setPortNumber( 8100).build();
-        reportProcessor.addReportBookExporter( new OoPdfExporter(officeManager));
-        reportProcessor.process( outputBook);
+        OfficeManager officeManager = ExternalOfficeManager.builder().portNumbers( 8100).build();
+        try {
+            officeManager.start();
+            reportProcessor.addReportBookExporter( new OoPdfExporter(officeManager));
+            reportProcessor.process( outputBook);
+        } finally {
+            officeManager.stop();
+        }
         
         System.exit( 0);
     }

@@ -21,21 +21,22 @@
 package org.bbreak.excella.reports.exporter;
 
 import java.io.File;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.bbreak.excella.core.BookData;
 import org.bbreak.excella.core.exception.ExportException;
 import org.bbreak.excella.reports.model.ConvertConfiguration;
-import org.jodconverter.LocalConverter;
-import org.jodconverter.document.DefaultDocumentFormatRegistry;
-import org.jodconverter.document.DocumentFamily;
-import org.jodconverter.document.DocumentFormat;
-import org.jodconverter.document.DocumentFormatRegistry;
-import org.jodconverter.document.SimpleDocumentFormatRegistry;
-import org.jodconverter.office.DefaultOfficeManagerBuilder;
-import org.jodconverter.office.OfficeException;
-import org.jodconverter.office.OfficeManager;
+import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
+import org.jodconverter.core.document.DocumentFamily;
+import org.jodconverter.core.document.DocumentFormat;
+import org.jodconverter.core.document.DocumentFormatRegistry;
+import org.jodconverter.core.document.SimpleDocumentFormatRegistry;
+import org.jodconverter.core.office.OfficeException;
+import org.jodconverter.core.office.OfficeManager;
+import org.jodconverter.local.LocalConverter;
+import org.jodconverter.local.office.ExternalOfficeManager;
 
 /**
  * OpenOfficePDF出力エクスポーター
@@ -124,7 +125,7 @@ public class OoPdfExporter extends ReportBookExporter {
         }
 
         if ( !controlOfficeManager) {
-            officeManager = new DefaultOfficeManagerBuilder().setPortNumbers( port).build();
+            officeManager = ExternalOfficeManager.builder().portNumbers( port).build();
             try {
                 officeManager.start();
             } catch ( OfficeException e) {
