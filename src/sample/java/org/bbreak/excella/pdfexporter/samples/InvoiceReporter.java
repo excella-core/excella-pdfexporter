@@ -138,9 +138,13 @@ public class InvoiceReporter {
         // 
         ReportProcessor reportProcessor = new ReportProcessor();
         OfficeManager officeManager = ExternalOfficeManager.builder().portNumbers( 8100).build();
-        officeManager.start();
-        reportProcessor.addReportBookExporter( new OoPdfExporter(officeManager));
-        reportProcessor.process( outputBook);
+        try {
+            officeManager.start();
+            reportProcessor.addReportBookExporter( new OoPdfExporter(officeManager));
+            reportProcessor.process( outputBook);
+        } finally {
+            officeManager.stop();
+        }
         
         System.exit( 0);
     }
