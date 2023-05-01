@@ -54,31 +54,29 @@ public class ReportsWorkbookTest extends WorkbookTest {
         Workbook workbook = null;
 
         String filename = this.getClass().getSimpleName();
-        
+
         if ( version.equals( "2007")) {
             filename = filename + "_expected.xlsx";
         } else if ( version.equals( "2003")) {
             filename = filename + "_expected.xls";
         }
-        
-        
+
         URL url = this.getClass().getResource( filename);
         try {
             String path = URLDecoder.decode( url.getFile(), "UTF-8");
-            
-            workbook = getWorkbook(path);
 
-        } catch (IOException | EncryptedDocumentException e) {
-            Assert.fail(e.toString());
+            workbook = getWorkbook( path);
+
+        } catch ( IOException | EncryptedDocumentException e) {
+            Assert.fail( e.toString());
         }
         return workbook;
     }
 
-    
     protected List<ParsedReportInfo> parseSheet( ReportsTagParser<?> parser, Sheet sheet, ReportsParserInfo reportsParserInfo) throws ParseException {
 
         List<ParsedReportInfo> parsedList = new ArrayList<ParsedReportInfo>();
-        
+
         for ( int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
             Row row = sheet.getRow( rowIndex);
             if ( row == null) {
@@ -90,7 +88,7 @@ public class ReportsWorkbookTest extends WorkbookTest {
                     continue;
                 }
                 if ( parser.isParse( sheet, cell)) {
-                    parsedList.add(parser.parse( sheet, cell, reportsParserInfo));
+                    parsedList.add( parser.parse( sheet, cell, reportsParserInfo));
                 }
 
             }
@@ -98,12 +96,10 @@ public class ReportsWorkbookTest extends WorkbookTest {
         }
         return parsedList;
     }
-    
-    
-    protected Workbook getWorkbook(String filepath) throws EncryptedDocumentException, IOException {
 
-        return WorkbookFactory.create(new File(filepath));
+    protected Workbook getWorkbook( String filepath) throws EncryptedDocumentException, IOException {
+
+        return WorkbookFactory.create( new File( filepath));
     }
-
 
 }
