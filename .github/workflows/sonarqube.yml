@@ -16,6 +16,8 @@ jobs:
     if: github.repository == 'excella-core/excella-pdfexporter'
 
     steps:
+      - name: debug
+        run: env
       - name: Set locale
         run: |
           sudo locale-gen ${LANG}
