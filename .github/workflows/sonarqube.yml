@@ -29,6 +29,10 @@ jobs:
           java-version: 11
           distribution: 'temurin'
           cache: maven
+      - name: Setup Libreoffice
+        run: |
+          sudo apt-get -q update
+          sudo apt-get -y install libreoffice-calc
       - name: Prepare configuration
         run: sed s/SONAR_TOKEN/env.SONAR_TOKEN/ dev/settings-sonarqube.default.xml | tee dev/settings-sonarqube.xml
       - name: Scan with SonarCloud

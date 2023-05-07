@@ -37,7 +37,9 @@ import org.bbreak.excella.reports.model.ReportSheet;
 import org.bbreak.excella.reports.processor.ReportProcessor;
 import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.core.office.OfficeManager;
-import org.jodconverter.local.office.ExternalOfficeManager;
+import org.jodconverter.local.office.LocalOfficeManager;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -51,7 +53,17 @@ public class OoPdfOutputStreamExporterTest {
 
     ConvertConfiguration configuration = null;
 
-    private OfficeManager officeManager = ExternalOfficeManager.builder().portNumbers( 8100).build();
+    private OfficeManager officeManager = LocalOfficeManager.builder().portNumbers( 8100).build();
+
+    @Before
+    public void startOfficeManager() throws OfficeException {
+        officeManager.start();
+    }
+
+    @After
+    public void stopOfficeManager() throws OfficeException {
+        officeManager.stop();
+    }
 
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfOutputStreamExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}
@@ -60,7 +72,6 @@ public class OoPdfOutputStreamExporterTest {
      */
     @Test
     public void testOutput() throws OfficeException {
-    	officeManager.start();
 
         // XLSテスト� - フォーマット複数指定・サイズ比較テスト
         FileOutputStream xlsFileOutputStream = null;
