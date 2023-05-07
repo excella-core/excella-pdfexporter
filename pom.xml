@@ -155,6 +155,20 @@
   		<scope>test</scope>
   	</dependency>
   	<dependency>
+  		<!-- LGPL 3.0 or MPL 2.0 (dual license) -->
+  		<groupId>com.github.librepdf</groupId>
+  		<artifactId>openpdf</artifactId>
+  		<version>1.3.30</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<!-- MIT License. Used by openpdf -->
+  		<groupId>org.bouncycastle</groupId>
+  		<artifactId>bcprov-jdk18on</artifactId>
+  		<version>1.73</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
   		<groupId>org.jodconverter</groupId>
   		<artifactId>jodconverter-local</artifactId>
   		<version>4.4.2</version>
