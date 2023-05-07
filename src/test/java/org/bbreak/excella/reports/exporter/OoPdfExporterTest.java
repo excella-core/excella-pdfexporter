@@ -25,7 +25,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.bbreak.excella.core.BookData;
@@ -70,10 +72,13 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}
      * のためのテスト・メソッド。
-     * @throws OfficeException 
+     * 
+     * @throws OfficeException
+     * @throws IOException (CI only) 外部プロセスの起動に失敗した場合
+     * @throws InterruptedException (CI only) 外部プロセスが規定時間内に完了しない場合
      */
     @Test
-    public void testOutput() throws OfficeException {
+    public void testOutput() throws OfficeException, IOException, InterruptedException {
 
         OoPdfExporter exporter = new OoPdfExporter( officeManager);
         String filePath = null;
@@ -122,6 +127,17 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
             }
             File file = new File( exporter.getFilePath());
             file.setReadOnly();
+            if ( "true".equals( System.getenv( "CI")) && System.getProperty( "os.name").toLowerCase().contains( "nux")) {
+                // Linux環境ではsetReadonlyしてもLibreOfficeがファイルを上書きできてしまうため、所有者を変更する
+                // ※Ubuntu 22.04 + ext4 fs + LibreOffice 7.3.7.2で確認。手順は「新規作成→chmod 444したファイルを指定して上書き保存」
+                // ods形式であればchmod 444したファイルを上書きできないが、xlsx形式の保存やpdfエクスポートでは上書きされてしまう
+                ProcessBuilder chownBuilder = new ProcessBuilder().command( "sudo", "chown", "root", exporter.getFilePath());
+                Process chown = chownBuilder.start();
+                if ( !chown.waitFor( 5, TimeUnit.SECONDS)) {
+                    chown.destroy();
+                    fail( "Could not execute command (timeout): " + String.join( " ", chownBuilder.command()));
+                }
+            }
             try {
                 exporter.output( wb, new BookData(), configuration);
                 fail( "例外未発生");
