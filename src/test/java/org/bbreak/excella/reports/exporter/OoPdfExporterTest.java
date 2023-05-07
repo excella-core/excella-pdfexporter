@@ -26,8 +26,10 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.bbreak.excella.core.BookData;
@@ -56,7 +58,7 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
     private String tmpDirPath = ReportsTestUtil.getTestOutputDir();
 
     ConvertConfiguration configuration = null;
-    
+
     private OfficeManager officeManager = LocalOfficeManager.builder().portNumbers( 8100).build();
 
     @Before
@@ -118,26 +120,26 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
             // 例外発生
             wb = getWorkbook();
             configuration = new ConvertConfiguration( OoPdfExporter.EXTENTION);
-            filePath = tmpDirPath + (new Date()).getTime() + exporter.getExtention();
-            exporter.setFilePath( filePath);
-            try {
-                exporter.output( wb, new BookData(), configuration);
-            } catch ( ExportException e) {
-                fail( e.toString());
-            }
-            File file = new File( exporter.getFilePath());
-            file.setReadOnly();
-            if ( "true".equals( System.getenv( "CI")) && System.getProperty( "os.name").toLowerCase().contains( "nux")) {
-                // Linux環境ではsetReadonlyしてもLibreOfficeがファイルを上書きできてしまうため、所有者を変更する
+            String fileName = new Date().getTime() + exporter.getExtention();
+            filePath = tmpDirPath + fileName;
+            if ( System.getProperty( "os.name").toLowerCase().contains( "nux")) {
+                // Linux環境ではsetReadonlyしてもLibreOfficeがファイルを上書きできてしまうため、おそらく書き込み許可がないであろうディレクトリに出力する
                 // ※Ubuntu 22.04 + ext4 fs + LibreOffice 7.3.7.2で確認。手順は「新規作成→chmod 444したファイルを指定して上書き保存」
                 // ods形式であればchmod 444したファイルを上書きできないが、xlsx形式の保存やpdfエクスポートでは上書きされてしまう
-                ProcessBuilder chownBuilder = new ProcessBuilder().command( "sudo", "chown", "root", exporter.getFilePath());
-                Process chown = chownBuilder.start();
-                if ( !chown.waitFor( 5, TimeUnit.SECONDS)) {
-                    chown.destroy();
-                    fail( "Could not execute command (timeout): " + String.join( " ", chownBuilder.command()));
+                exporter.setFilePath( "/proc/" + fileName);
+                Runtime.getRuntime().addShutdownHook( new Thread( () -> cleanFile( exporter.getFilePath())));
+            } else {
+                // すでに存在するファイル(書き込み許可なし)の上書きを試みる
+                exporter.setFilePath( filePath);
+                try {
+                    exporter.output( wb, new BookData(), configuration);
+                } catch ( ExportException e) {
+                    fail( e.toString());
                 }
+                File file = new File( exporter.getFilePath());
+                file.setReadOnly();
             }
+
             try {
                 exporter.output( wb, new BookData(), configuration);
                 fail( "例外未発生");
@@ -151,6 +153,13 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
 
     }
 
+    private void cleanFile( String path) {
+        try {
+            Files.deleteIfExists( Paths.get( path));
+        } catch ( IOException e) {
+            throw new UncheckedIOException( e);
+        }
+    }
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfExporter#getFormatType()} のためのテスト・メソッド。
      */
