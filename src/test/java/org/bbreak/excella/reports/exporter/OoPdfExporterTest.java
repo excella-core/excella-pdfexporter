@@ -25,6 +25,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -35,7 +39,9 @@ import org.bbreak.excella.reports.model.ConvertConfiguration;
 import org.bbreak.excella.reports.processor.ReportsWorkbookTest;
 import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.core.office.OfficeManager;
-import org.jodconverter.local.office.ExternalOfficeManager;
+import org.jodconverter.local.office.LocalOfficeManager;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -52,17 +58,29 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
     private String tmpDirPath = ReportsTestUtil.getTestOutputDir();
 
     ConvertConfiguration configuration = null;
-    
-    private OfficeManager officeManager = ExternalOfficeManager.builder().portNumbers( 8100).build();
+
+    private OfficeManager officeManager = LocalOfficeManager.builder().portNumbers( 8100).build();
+
+    @Before
+    public void startOfficeManager() throws OfficeException {
+        officeManager.start();
+    }
+
+    @After
+    public void stopOfficeManager() throws OfficeException {
+        officeManager.stop();
+    }
 
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}
      * のためのテスト・メソッド。
-     * @throws OfficeException 
+     * 
+     * @throws OfficeException
+     * @throws IOException (CI only) 外部プロセスの起動に失敗した場合
+     * @throws InterruptedException (CI only) 外部プロセスが規定時間内に完了しない場合
      */
     @Test
-    public void testOutput() throws OfficeException {
-    	officeManager.start();
+    public void testOutput() throws OfficeException, IOException, InterruptedException {
 
         OoPdfExporter exporter = new OoPdfExporter( officeManager);
         String filePath = null;
@@ -102,15 +120,26 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
             // 例外発生
             wb = getWorkbook();
             configuration = new ConvertConfiguration( OoPdfExporter.EXTENTION);
-            filePath = tmpDirPath + (new Date()).getTime() + exporter.getExtention();
-            exporter.setFilePath( filePath);
-            try {
-                exporter.output( wb, new BookData(), configuration);
-            } catch ( ExportException e) {
-                fail( e.toString());
+            String fileName = new Date().getTime() + exporter.getExtention();
+            filePath = tmpDirPath + fileName;
+            if ( System.getProperty( "os.name").toLowerCase().contains( "nux")) {
+                // Linux環境ではsetReadonlyしてもLibreOfficeがファイルを上書きできてしまうため、おそらく書き込み許可がないであろうディレクトリに出力する
+                // ※Ubuntu 22.04 + ext4 fs + LibreOffice 7.3.7.2で確認。手順は「新規作成→chmod 444したファイルを指定して上書き保存」
+                // ods形式であればchmod 444したファイルを上書きできないが、xlsx形式の保存やpdfエクスポートでは上書きされてしまう
+                exporter.setFilePath( "/proc/" + fileName);
+                Runtime.getRuntime().addShutdownHook( new Thread( () -> cleanFile( exporter.getFilePath())));
+            } else {
+                // すでに存在するファイル(書き込み許可なし)の上書きを試みる
+                exporter.setFilePath( filePath);
+                try {
+                    exporter.output( wb, new BookData(), configuration);
+                } catch ( ExportException e) {
+                    fail( e.toString());
+                }
+                File file = new File( exporter.getFilePath());
+                file.setReadOnly();
             }
-            File file = new File( exporter.getFilePath());
-            file.setReadOnly();
+
             try {
                 exporter.output( wb, new BookData(), configuration);
                 fail( "例外未発生");
@@ -124,6 +153,13 @@ public class OoPdfExporterTest extends ReportsWorkbookTest {
 
     }
 
+    private void cleanFile( String path) {
+        try {
+            Files.deleteIfExists( Paths.get( path));
+        } catch ( IOException e) {
+            throw new UncheckedIOException( e);
+        }
+    }
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfExporter#getFormatType()} のためのテスト・メソッド。
      */

@@ -32,7 +32,7 @@
     <repository>
 	  <id>excella.bbreak.org</id>
       <name>bBreak Systems Excella</name>
-      <url>http://excella-core.github.io/maven2/</url>    
+      <url>https://excella-core.github.io/maven2/</url>    
     </repository>
   </repositories>
   <build>
@@ -114,7 +114,7 @@
 		<plugin>
 			<groupId>org.jacoco</groupId>
 			<artifactId>jacoco-maven-plugin</artifactId>
-			<version>0.8.6</version>
+			<version>0.8.10</version>
 			<executions>
 				<execution>
 					<id>prepare-agent</id>
@@ -152,6 +152,20 @@
   		<groupId>junit</groupId>
   		<artifactId>junit</artifactId>
   		<version>4.13.1</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<!-- LGPL 3.0 or MPL 2.0 (dual license) -->
+  		<groupId>com.github.librepdf</groupId>
+  		<artifactId>openpdf</artifactId>
+  		<version>1.3.30</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<!-- MIT License. Used by openpdf -->
+  		<groupId>org.bouncycastle</groupId>
+  		<artifactId>bcprov-jdk18on</artifactId>
+  		<version>1.73</version>
   		<scope>test</scope>
   	</dependency>
   	<dependency>

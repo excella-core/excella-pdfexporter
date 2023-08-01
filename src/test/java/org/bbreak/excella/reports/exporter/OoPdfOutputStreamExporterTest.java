@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.Date;
 
 import org.bbreak.excella.reports.ReportsTestUtil;
@@ -37,8 +38,13 @@ import org.bbreak.excella.reports.model.ReportSheet;
 import org.bbreak.excella.reports.processor.ReportProcessor;
 import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.core.office.OfficeManager;
-import org.jodconverter.local.office.ExternalOfficeManager;
+import org.jodconverter.local.office.LocalOfficeManager;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.parser.PdfTextExtractor;
 
 /**
  * {@link org.bbreak.excella.reports.exporter.OoPdfOutputStreamExporter} のためのテスト・クラス。
@@ -51,7 +57,17 @@ public class OoPdfOutputStreamExporterTest {
 
     ConvertConfiguration configuration = null;
 
-    private OfficeManager officeManager = ExternalOfficeManager.builder().portNumbers( 8100).build();
+    private OfficeManager officeManager = LocalOfficeManager.builder().portNumbers( 8100).build();
+
+    @Before
+    public void startOfficeManager() throws OfficeException {
+        officeManager.start();
+    }
+
+    @After
+    public void stopOfficeManager() throws OfficeException {
+        officeManager.stop();
+    }
 
     /**
      * {@link org.bbreak.excella.reports.exporter.OoPdfOutputStreamExporter#output(org.apache.poi.ss.usermodel.Workbook, org.bbreak.excella.core.BookData, org.bbreak.excella.reports.model.ConvertConfiguration)}
@@ -60,7 +76,6 @@ public class OoPdfOutputStreamExporterTest {
      */
     @Test
     public void testOutput() throws OfficeException {
-    	officeManager.start();
 
         // XLSテスト� - フォーマット複数指定・サイズ比較テスト
         FileOutputStream xlsFileOutputStream = null;
@@ -87,11 +102,8 @@ public class OoPdfOutputStreamExporterTest {
 
             File xlsExcelFile = new File( filePath + ".pdf");
 
-            // サイズ比較
-            long xlsFileByteLength = xlsExcelFile.length();
-            long xlsStreamFileSize = xlsStreamFile.length();
-            assertEquals( xlsFileByteLength, xlsStreamFileSize);
-
+            // 内容比較
+            assertPdfContentEquals( xlsExcelFile, xlsStreamFile);
         } catch ( Exception e) {
             e.getStackTrace();
             fail( e.toString());
@@ -177,6 +189,19 @@ public class OoPdfOutputStreamExporterTest {
                 e.printStackTrace();
                 fail( e.toString());
             }
+        }
+    }
+
+    private void assertPdfContentEquals( File xlsExcelFile, File xlsStreamFile) throws IOException {
+        String xlsExcelContent = readPdfContent( xlsExcelFile);
+        String xlsStreamContent = readPdfContent( xlsStreamFile);
+        assertEquals( xlsExcelContent, xlsStreamContent);
+    }
+
+    private String readPdfContent( File pdfFile) throws IOException {
+        byte[] bytes = Files.readAllBytes( pdfFile.toPath());
+        try (PdfReader reader = new PdfReader( bytes)) {
+            return new PdfTextExtractor( reader).getTextFromPage( 1);
         }
     }
 }
