@@ -165,7 +165,7 @@
   		<!-- MIT License. Used by openpdf -->
   		<groupId>org.bouncycastle</groupId>
   		<artifactId>bcprov-jdk18on</artifactId>
-  		<version>1.73</version>
+  		<version>1.74</version>
   		<scope>test</scope>
   	</dependency>
   	<dependency>
